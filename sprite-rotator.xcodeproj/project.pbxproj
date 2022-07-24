@@ -7,7 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D1A69259288D71460020AAAF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1A69258288D71460020AAAF /* main.cpp */; };
+		D1A69260288D71B20020AAAF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1A6925F288D71B20020AAAF /* main.cpp */; };
+		D1A69263288D72530020AAAF /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D1A69261288D72530020AAAF /* libSDL2.a */; };
+		D1A69264288D72530020AAAF /* libSDL2main.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D1A69262288D72530020AAAF /* libSDL2main.a */; };
+		D1A69266288DAD340020AAAF /* libSDL2_image.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D1A69265288DAD340020AAAF /* libSDL2_image.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +27,10 @@
 
 /* Begin PBXFileReference section */
 		D1A69255288D71460020AAAF /* sprite-rotator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "sprite-rotator"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D1A69258288D71460020AAAF /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		D1A6925F288D71B20020AAAF /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		D1A69261288D72530020AAAF /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = lib/libSDL2.a; sourceTree = "<group>"; };
+		D1A69262288D72530020AAAF /* libSDL2main.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2main.a; path = lib/libSDL2main.a; sourceTree = "<group>"; };
+		D1A69265288DAD340020AAAF /* libSDL2_image.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2_image.a; path = lib/libSDL2_image.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +38,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D1A69263288D72530020AAAF /* libSDL2.a in Frameworks */,
+				D1A69264288D72530020AAAF /* libSDL2main.a in Frameworks */,
+				D1A69266288DAD340020AAAF /* libSDL2_image.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,6 +50,9 @@
 		D1A6924C288D71460020AAAF = {
 			isa = PBXGroup;
 			children = (
+				D1A69265288DAD340020AAAF /* libSDL2_image.a */,
+				D1A69261288D72530020AAAF /* libSDL2.a */,
+				D1A69262288D72530020AAAF /* libSDL2main.a */,
 				D1A69257288D71460020AAAF /* sprite-rotator */,
 				D1A69256288D71460020AAAF /* Products */,
 			);
@@ -57,7 +69,7 @@
 		D1A69257288D71460020AAAF /* sprite-rotator */ = {
 			isa = PBXGroup;
 			children = (
-				D1A69258288D71460020AAAF /* main.cpp */,
+				D1A6925F288D71B20020AAAF /* main.cpp */,
 			);
 			path = "sprite-rotator";
 			sourceTree = "<group>";
@@ -119,7 +131,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D1A69259288D71460020AAAF /* main.cpp in Sources */,
+				D1A69260288D71B20020AAAF /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +170,8 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -216,6 +230,8 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -238,20 +254,32 @@
 		D1A6925D288D71460020AAAF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 8347MHLL89;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
 		};
 		D1A6925E288D71460020AAAF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 8347MHLL89;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Release;
 		};
