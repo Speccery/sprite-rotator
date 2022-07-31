@@ -32,6 +32,9 @@ const int miniature_scale = 2;
 const int miniature_x = 16*8+16;
 const int miniature_y = 16;
 
+const int sx=8, sy=8;
+
+
 uint8_t sprite[16][16] = { 0 };
 
 // Supersample, calculate rotation around middle of the sprite.
@@ -143,6 +146,91 @@ public:
 super_sampler sampler(5);
 super_sampler lores(8);
 
+void render_begin() {
+  
+  SDL_SetRenderTarget(renderer, current);
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xFF);
+  SDL_RenderClear(renderer);
+  
+  // Draw our sprite so far.
+  SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
+  SDL_Rect r = { miniature_x-1, miniature_y-1, 16*miniature_scale+2, 16*miniature_scale+2 };
+  SDL_RenderDrawRect(renderer, &r);
+  int ymax  = 0;
+  for(int y=0; y<16; y++) {
+    for(int x=0; x<16; x++) {
+      r.x = x*sx;
+      r.y = y*sy;
+      r.w = sx;
+      r.h = sy;
+      SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
+      if(sprite[y][x]) {
+        SDL_RenderFillRect(renderer, &r);
+      } else {
+        SDL_RenderDrawRect(renderer, &r);
+      }
+      
+      // Also draw miniature version.
+      if(sprite[y][x]) {
+        r.x = miniature_x + x*miniature_scale;
+        r.y = miniature_y + y*miniature_scale;
+        r.w = miniature_scale;
+        r.h = miniature_scale;
+        SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255);
+        SDL_RenderFillRect(renderer, &r);
+      }
+    }
+  }
+
+  // Draw the rotated pictures, supersampled version and fat pixels.
+  int height = 240; // sampler.get_size1()+lores.get_size1();
+  int width = std::max(sampler.get_size1(), lores.get_size1());
+  r = { 200, 0, width, height  };
+  SDL_Rect rdest = { 200, 0, width, height };
+  SDL_RenderCopy(renderer, texture, &r, &rdest);
+
+  ymax = height;
+  
+  static SDL_Color colors[15] = { // r, g, b, a
+    0x00, 0x00, 0x00, 0xff,
+    0x21, 0xc8, 0x42, 0xff,
+    0x5e, 0xdc, 0x78, 0xff,
+    0x54, 0x55, 0xed, 0xff,
+    0x7d, 0x76, 0xfc, 0xff,
+    0xd4, 0x52, 0x4d, 0xff,
+    0x42, 0xeb, 0xf5, 0xff,
+    0xfc, 0x55, 0x54, 0xff,
+    0xff, 0x79, 0x78, 0xff,
+    0xd4, 0xc1, 0x54, 0xff,
+    0xe6, 0xce, 0x80, 0xff,
+    0x21, 0xb0, 0x3b, 0xff,
+    0xc9, 0x5b, 0xba, 0xff,
+    0xcc, 0xcc, 0xcc, 0xff,
+    0xff, 0xff, 0xff, 0xff
+  };
+
+  // Draw the TMS9918 color palette.
+  for(int i=0; i<15; i++) {
+    r = { i*16, ymax, 16, 16 };
+    SDL_SetRenderDrawColor(renderer,
+                           colors[i].r, colors[i].g, colors[i].b, colors[i].a);
+    SDL_RenderFillRect(renderer, &r);
+  }
+
+}
+
+void render_end() {
+  // Show toggle indicator if needed
+  if(draw_toggle) {
+    SDL_Rect      r         = { 0,     0, 131, 20 };
+    SDL_Rect      dest_rect = { 0, 17*sy, r.w, r.h };
+    SDL_RenderCopy(renderer, assets, &r, &dest_rect);
+  }
+  
+  // SDL_RenderDrawLine(renderer, 0, y, width-1, y);
+  SDL_RenderPresent(renderer);
+}
+
 void handle_event(SDL_Event &event) {
   switch (event.type) {
     case SDL_QUIT:
@@ -169,53 +257,7 @@ void handle_event(SDL_Event &event) {
         // }
         // https://wiki.libsdl.org/SDL_RenderCopy
         
-
-        
-        SDL_SetRenderTarget(renderer, current);
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xFF);
-        SDL_RenderClear(renderer);
-        
-
-        
-        // Draw our sprite so far.
-        SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
-        SDL_Rect r = { miniature_x-1, miniature_y-1, 16*miniature_scale+2, 16*miniature_scale+2 };
-        SDL_RenderDrawRect(renderer, &r);
-        const int sx=8, sy=8;
-        for(int y=0; y<16; y++) {
-          for(int x=0; x<16; x++) {
-            r.x = x*sx;
-            r.y = y*sy;
-            r.w = sx;
-            r.h = sy;
-            SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
-            if(sprite[y][x]) {
-              SDL_RenderFillRect(renderer, &r);
-            } else {
-              SDL_RenderDrawRect(renderer, &r);
-            }
-            
-            // Also draw miniature version.
-            if(sprite[y][x]) {
-              r.x = miniature_x + x*miniature_scale;
-              r.y = miniature_y + y*miniature_scale;
-              r.w = miniature_scale;
-              r.h = miniature_scale;
-              SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255);
-              SDL_RenderFillRect(renderer, &r);
-            }
-          }
-        }
-      
-        // Draw the rotated pictures, supersampled version and fat pixels.
-        int height = 240; // sampler.get_size1()+lores.get_size1();
-        int width = std::max(sampler.get_size1(), lores.get_size1());
-        r = { 200, 0, width, height  };
-        SDL_Rect rdest = { 200, 0, width, height };
-        SDL_RenderCopy(renderer, texture, &r, &rdest);
-        
-
-        
+        render_begin();
 
         int y = event.key.keysym.scancode;
         if(event.type == SDL_KEYDOWN) {
@@ -226,8 +268,43 @@ void handle_event(SDL_Event &event) {
             case SDLK_LEFT: curx = std::max(curx-1, 0); break;
             case SDLK_RIGHT:  curx = std::min(curx+1, 15); break;
             case SDLK_t:     draw_toggle = !draw_toggle; break;
-            case SDLK_q:     rot_angle -= 0.1f; break;
-            case SDLK_w:     rot_angle += 0.1f; break;
+            case SDLK_q:     rot_angle += 3.141529f/32; break;
+            case SDLK_e:     rot_angle -= 3.141529f/32; break;
+            case SDLK_0:     rot_angle = 0; break;
+            case SDLK_s:      // Shift down the whole thing
+            {
+              uint8_t buf[16];
+              memcpy(buf, sprite[15], 16); // Backup bottom row
+              memmove(sprite[1], sprite[0], 16*15);
+              memcpy(sprite[0], buf, 16);
+              break;
+            }
+            case SDLK_w:      // Shift up the whole thing
+            {
+              uint8_t buf[16];
+              memcpy(buf, sprite[0], 16); // Backup top row
+              memcpy(sprite[0], sprite[1], 16*15);
+              memcpy(sprite[15], buf, 16);
+              break;
+            }
+            case SDLK_a:      // Shift left the whole thing
+            {
+              for(int i=0; i<16; i++) {
+                uint8_t t = sprite[i][0];
+                memmove(&sprite[i][0], &sprite[i][1], 15);
+                sprite[i][15] = t;
+              }
+              break;
+            }
+            case SDLK_d:      // Shift right the whole thing.
+            {
+              for(int i=0; i<16; i++) {
+                uint8_t t = sprite[i][15];
+                memmove(&sprite[i][1], &sprite[i][0], 15);
+                sprite[i][0] = t;
+              }
+              break;
+            }
             case SDLK_SPACE:
               sprite[cury][curx] ^= 1;
               break;
@@ -241,7 +318,7 @@ void handle_event(SDL_Event &event) {
           }
           
           if(event.type == SDL_KEYDOWN &&
-             (event.key.keysym.sym == SDLK_r || event.key.keysym.sym == SDLK_q || event.key.keysym.sym == SDLK_w)) {
+             (event.key.keysym.sym == SDLK_r || event.key.keysym.sym == SDLK_q || event.key.keysym.sym == SDLK_e)) {
             // SDL_SetRenderTarget(renderer, nullptr);
             // Draw supersampled version...
             uint8_t *p = nullptr;
@@ -269,16 +346,7 @@ void handle_event(SDL_Event &event) {
           // KEYUP
           SDL_SetRenderDrawColor(renderer, 128, 128, 128,0);
         }
-        
-        // Show toggle indicator if needed
-        if(draw_toggle) {
-          SDL_Rect      r         = { 0,     0, 131, 20 };
-          SDL_Rect      dest_rect = { 0, 17*sy, r.w, r.h };
-          SDL_RenderCopy(renderer, assets, &r, &dest_rect);
-        }
-        
-        // SDL_RenderDrawLine(renderer, 0, y, width-1, y);
-        SDL_RenderPresent(renderer);
+        render_end();
         break;
 /*
         // Not sure if the RenderDrawLine works for textures. F... it. Let's just lock and draw manually.
