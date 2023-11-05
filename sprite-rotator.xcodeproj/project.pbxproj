@@ -26,6 +26,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6FD8EFFC2AF7D53C003801F7 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		D1A69255288D71460020AAAF /* sprite-rotator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "sprite-rotator"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1A6925F288D71B20020AAAF /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		D1A69261288D72530020AAAF /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = lib/libSDL2.a; sourceTree = "<group>"; };
@@ -50,6 +51,7 @@
 		D1A6924C288D71460020AAAF = {
 			isa = PBXGroup;
 			children = (
+				6FD8EFFC2AF7D53C003801F7 /* README.md */,
 				D1A69265288DAD340020AAAF /* libSDL2_image.a */,
 				D1A69261288D72530020AAAF /* libSDL2.a */,
 				D1A69262288D72530020AAAF /* libSDL2main.a */,

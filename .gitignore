@@ -1,3 +1,5 @@
 Build
 include
 lib
+sprite-rotator.xcodeproj/xcuserdata
+DerivedData
