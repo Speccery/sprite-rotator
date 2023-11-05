@@ -34,8 +34,25 @@ const int miniature_y = 16;
 
 const int sx=8, sy=8;
 
+static SDL_Color colors[15] = { // r, g, b, a
+  0x00, 0x00, 0x00, 0xff,
+  0x21, 0xc8, 0x42, 0xff,
+  0x5e, 0xdc, 0x78, 0xff,
+  0x54, 0x55, 0xed, 0xff,
+  0x7d, 0x76, 0xfc, 0xff,
+  0xd4, 0x52, 0x4d, 0xff,
+  0x42, 0xeb, 0xf5, 0xff,
+  0xfc, 0x55, 0x54, 0xff,
+  0xff, 0x79, 0x78, 0xff,
+  0xd4, 0xc1, 0x54, 0xff,
+  0xe6, 0xce, 0x80, 0xff,
+  0x21, 0xb0, 0x3b, 0xff,
+  0xc9, 0x5b, 0xba, 0xff,
+  0xcc, 0xcc, 0xcc, 0xff,
+  0xff, 0xff, 0xff, 0xff
+};
 
-uint8_t sprite[16][16] = { 0 };
+uint8_t sprite[16][16] = { 0 }; // entries are indeces to colors above
 
 // Supersample, calculate rotation around middle of the sprite.
 class super_sampler {
@@ -191,23 +208,7 @@ void render_begin() {
 
   ymax = height;
   
-  static SDL_Color colors[15] = { // r, g, b, a
-    0x00, 0x00, 0x00, 0xff,
-    0x21, 0xc8, 0x42, 0xff,
-    0x5e, 0xdc, 0x78, 0xff,
-    0x54, 0x55, 0xed, 0xff,
-    0x7d, 0x76, 0xfc, 0xff,
-    0xd4, 0x52, 0x4d, 0xff,
-    0x42, 0xeb, 0xf5, 0xff,
-    0xfc, 0x55, 0x54, 0xff,
-    0xff, 0x79, 0x78, 0xff,
-    0xd4, 0xc1, 0x54, 0xff,
-    0xe6, 0xce, 0x80, 0xff,
-    0x21, 0xb0, 0x3b, 0xff,
-    0xc9, 0x5b, 0xba, 0xff,
-    0xcc, 0xcc, 0xcc, 0xff,
-    0xff, 0xff, 0xff, 0xff
-  };
+
 
   // Draw the TMS9918 color palette.
   for(int i=0; i<15; i++) {
@@ -216,6 +217,18 @@ void render_begin() {
                            colors[i].r, colors[i].g, colors[i].b, colors[i].a);
     SDL_RenderFillRect(renderer, &r);
   }
+
+  // Draw our cursor, flash it 5 times per second.
+  uint32_t t = SDL_GetTicks();
+  if(t % 200 < 100)
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
+  else
+    SDL_SetRenderDrawColor(renderer, 200, 200, 200, 0);
+  r.x = curx*sx;
+  r.y = cury*sy;
+  r.w = sx;
+  r.h = sy;
+  SDL_RenderDrawRect(renderer, &r);
 
 }
 
@@ -242,8 +255,12 @@ void handle_event(SDL_Event &event) {
       // }
       break;
     case SDL_MOUSEBUTTONUP:
+      break;
     case SDL_MOUSEBUTTONDOWN:
       //blit_input->handle_mouse(event.button.button, event.type == SDL_MOUSEBUTTONDOWN, event.button.x, event.button.y);
+      if(event.button.button == SDL_BUTTON_LEFT) {
+        // Check if we are choosing color and change color.
+      }
       break;
     case SDL_MOUSEMOTION:
       // if (event.motion.state & SDL_BUTTON_LMASK) {
@@ -333,14 +350,6 @@ void handle_event(SDL_Event &event) {
             }
           }
 
-          // Draw our cursor
-          SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
-          SDL_Rect r;
-          r.x = curx*sx;
-          r.y = cury*sy;
-          r.w = sx;
-          r.h = sy;
-          SDL_RenderDrawRect(renderer, &r);
 
         } else {
           // KEYUP
@@ -348,40 +357,6 @@ void handle_event(SDL_Event &event) {
         }
         render_end();
         break;
-/*
-        // Not sure if the RenderDrawLine works for textures. F... it. Let's just lock and draw manually.
-        uint8_t *p = nullptr;
-        int pitch;
-        SDL_LockTexture(current, nullptr, (void **)&p, &pitch);
-        if(p != nullptr) {
-          uint8_t r,g,b;
-          if(event.type == SDL_KEYDOWN) {
-            r = 255; g=0; b=0;
-          } else {
-            r = g = b = 128;
-          }
-          uint8_t *d = p + pitch*y;
-          for(int x=0; x<width; x++) {
-            *d++ = r;
-            *d++ = g;
-            *d++ = b;
-          }
-        }
-        SDL_UnlockTexture(current);
-*/
-        SDL_SetRenderTarget(renderer, nullptr);  // test - render to window
-        SDL_SetRenderDrawColor(renderer, 0, 128, 0, 0);
-        SDL_RenderClear(renderer);
-        
-        int ww = width, hh = height;
-        SDL_GetRendererOutputSize(renderer, &ww, &hh);
-        SDL_Rect dest;
-        dest.x = dest.y = 0;
-        dest.w = ww;
-        dest.h = hh;
-        SDL_RenderCopy(renderer, current, nullptr, &dest); // test
-        SDL_RenderPresent(renderer);
-
       }
       break;
     case SDL_RENDER_TARGETS_RESET:
@@ -433,7 +408,7 @@ int main(int argc, const char * argv[]) {
           return 1;
   }
   
-  renderer = SDL_CreateRenderer(window, -1, 0);
+  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   if (renderer == nullptr) {
     std::cerr << "could not create renderer: " << SDL_GetError() << std::endl;
     return 1;
@@ -480,9 +455,18 @@ int main(int argc, const char * argv[]) {
   
   SDL_SetWindowMinimumSize(window, width, height);
   
+  // Render the stuff.
+  render_begin();
+  render_end();
+  
+  int count=0;
   SDL_Event event;
-  while (running && SDL_WaitEvent(&event)) {
-          handle_event(event);
+  while (running) {
+    while(running && SDL_PollEvent(&event) != 0)
+      handle_event(event);
+    count++;
+    render_begin();
+    render_end();
   }
   
   // Try to save our sprite.
